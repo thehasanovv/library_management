@@ -1,4 +1,4 @@
-package com.library.model;
+package com.library.model.constants;
 
 public interface SqlCommandsConstants {
     String INSERT_BOOK_SQL = "INSERT INTO books (title, author, published_year, genre) VALUES (?, ?, ?, ?)";

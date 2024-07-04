@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import static com.library.dao.DBConnection.getConnection;
-import static com.library.model.SqlConnectionConstants.CREATE_BOOKS_TABLE_SQL;
+import static com.library.model.constants.SqlConnectionConstants.CREATE_BOOKS_TABLE_SQL;
 
 public class CreateBookTable {
     public static void createBooksTable()  {

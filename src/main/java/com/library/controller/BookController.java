@@ -6,15 +6,16 @@ import com.library.service.BookService;
 import java.util.List;
 import java.util.Scanner;
 
+import static com.library.model.constants.ExceptionConstants.BOOK_LIST_NOT_FOUND;
 import static com.library.util.PrintMessage.printMessage;
 
 public class BookController {
-    private BookService bookService;
-    private Scanner scanner;
+    private final BookService bookService;
+    private final Scanner scanner;
 
-    public BookController() {
-        this.bookService = new BookService();
-        this.scanner = new Scanner(System.in);
+    public BookController(BookService bookService, Scanner scanner) {
+        this.bookService = bookService;
+        this.scanner = scanner;
     }
 
     public void start() {
@@ -76,7 +77,7 @@ public class BookController {
     private void listBooks() {
         List<BookEntity> books = bookService.getAllBooks();
         if (books.size() == 0) {
-            printMessage("Book not found!");
+            printMessage(BOOK_LIST_NOT_FOUND);
         }
         for (BookEntity book : books) {
             printMessage(book);
@@ -89,10 +90,6 @@ public class BookController {
         scanner.nextLine();  // consume newline
 
         BookEntity book = bookService.getBook(id);
-        if (book == null) {
-            printMessage("Book not found!");
-            return;
-        }
 
         System.out.println(book);
     }

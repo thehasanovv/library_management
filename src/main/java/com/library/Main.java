@@ -1,14 +1,17 @@
 package com.library;
 
 import com.library.controller.BookController;
+import com.library.dao.BookRepository;
+import com.library.service.BookService;
 
-import static com.library.dao.CreateBookTable.createBooksTable;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        createBooksTable();
 
-        BookController bookController = new BookController();
+        BookController bookController =
+                new BookController(new BookService(new BookRepository()), new Scanner(System.in));
+
         bookController.start();
     }
 }

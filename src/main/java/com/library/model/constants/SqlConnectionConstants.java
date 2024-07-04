@@ -1,4 +1,4 @@
-package com.library.model;
+package com.library.model.constants;
 
 public interface SqlConnectionConstants {
     String JDBC_URL = "jdbc:mysql://localhost:3306/library_db?allowPublicKeyRetrieval=true&useSSL=false";

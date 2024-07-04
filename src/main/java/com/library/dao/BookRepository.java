@@ -1,6 +1,7 @@
 package com.library.dao;
 
 import com.library.entity.BookEntity;
+import com.library.exception.NotFoundException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,80 +11,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.library.dao.DBConnection.getConnection;
-import static com.library.model.SqlCommandsConstants.*;
+import static com.library.mapper.BookMapper.buildBookEntity;
+import static com.library.mapper.BookMapper.buildPreparedStatement;
+import static com.library.model.constants.SqlCommandsConstants.*;
 
 public class BookRepository {
-    public void addBook(BookEntity book) throws SQLException {
+    public void addBook(BookEntity book)  {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_BOOK_SQL)) {
-            preparedStatement.setString(1, book.getTitle());
-            preparedStatement.setString(2, book.getAuthor());
-            preparedStatement.setInt(3, book.getPublishedYear());
-            preparedStatement.setString(4, book.getGenre());
-            preparedStatement.executeUpdate();
+            buildPreparedStatement(preparedStatement, book).executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public BookEntity getBook(int id) throws SQLException {
+    public BookEntity getBook(int id)  {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BOOK_BY_ID)) {
             preparedStatement.setInt(1, id);
             ResultSet rs = preparedStatement.executeQuery();
-
-            if (!rs.next()) {
-                throw new SQLException("Book not found with id: " + id);
-            }
-
-            BookEntity bookEntity = new BookEntity();
-            while (rs.next()) {
-                bookEntity.setId(rs.getInt("id"));
-                bookEntity.setTitle(rs.getString("title"));
-                bookEntity.setAuthor(rs.getString("author"));
-                bookEntity.setPublishedYear(rs.getInt("published_year"));
-                bookEntity.setGenre(rs.getString("genre"));
-            }
-            return bookEntity;
+            rs.next();
+            return buildBookEntity(rs);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void updateBook(BookEntity book) throws SQLException {
+    public void updateBook(BookEntity book)  {
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_BOOK_SQL)) {
-            preparedStatement.setString(1, book.getTitle());
-            preparedStatement.setString(2, book.getAuthor());
-            preparedStatement.setInt(3, book.getPublishedYear());
-            preparedStatement.setString(4, book.getGenre());
+            buildPreparedStatement(preparedStatement, book);
             preparedStatement.setInt(5, book.getId());
-
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public boolean deleteBook(int id) throws SQLException {
-        boolean rowDeleted;
+    public void deleteBook(int id)  {
         try (Connection connection = getConnection(); PreparedStatement statement =
                 connection.prepareStatement(DELETE_BOOK_SQL)) {
             statement.setInt(1, id);
-            rowDeleted = statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new NotFoundException("Book Not Found!");
         }
-        return rowDeleted;
     }
 
-    public List<BookEntity> getAllBooks() throws SQLException {
+    public List<BookEntity> getAllBooks()  {
         List<BookEntity> books = new ArrayList<>();
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_BOOKS)) {
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) {
-                BookEntity bookEntity = new BookEntity();
-
-                bookEntity.setId(rs.getInt("id"));
-                bookEntity.setTitle(rs.getString("title"));
-                bookEntity.setAuthor(rs.getString("author"));
-                bookEntity.setPublishedYear(rs.getInt("published_year"));
-                bookEntity.setGenre(rs.getString("genre"));
-                books.add(bookEntity);
+                books.add(buildBookEntity(rs));
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
         return books;
     }
